@@ -22,12 +22,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "A company with that name already exists" }, { status: 409 });
     }
 
-    const [result] = await db.execute<mysql.ResultSetHeader>(
+    await db.execute(
       "INSERT INTO companies (name, logo, description) VALUES (?, ?, ?)",
       [name.trim(), domain.trim().toLowerCase(), description.trim()]
     );
 
-    return NextResponse.json({ id: result.insertId, name: name.trim(), logo: domain.trim().toLowerCase(), description: description.trim(), total_bid: 0 });
+    // Fetch the inserted row by name (TiDB serverless sometimes returns insertId=0)
+    const [inserted] = await db.execute<mysql.RowDataPacket[]>(
+      "SELECT * FROM companies WHERE name = ?",
+      [name.trim()]
+    );
+    const company = inserted[0];
+
+    return NextResponse.json({ id: company.id, name: company.name, logo: company.logo, description: company.description, total_bid: 0 });
   } catch (err) {
     console.error(err);
     return NextResponse.json({ error: "Failed to add company" }, { status: 500 });
