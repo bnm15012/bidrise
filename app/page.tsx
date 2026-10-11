@@ -394,7 +394,7 @@ function PodiumCard({ company, rank, onBid }: { company: Company; rank: number; 
 
         {/* Rank badge */}
         <div
-          className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-black text-white shadow-lg"
+          className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-black text-gray-900 shadow-lg"
           style={{ background: rankBadgeStyles[rank] }}
         >
           {rank}
@@ -424,8 +424,8 @@ function PodiumCard({ company, rank, onBid }: { company: Company; rank: number; 
           {company.logo} ↗
         </a>
 
-        <span className="text-[10px] font-semibold tracking-widest" style={{ color: "rgba(255,255,255,0.0)" }}>
-          <span className="group-hover:opacity-100 opacity-0 transition-opacity" style={{ color: rank === 1 ? "#c4b5fd" : "rgba(255,255,255,0.5)" }}>BID NOW →</span>
+        <span className="text-[10px] font-bold tracking-widest text-white opacity-80">
+          BID NOW →
         </span>
       </button>
     </div>
