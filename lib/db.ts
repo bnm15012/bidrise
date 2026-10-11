@@ -4,7 +4,7 @@ let pool: mysql.Pool | null = null;
 
 export function getPool(): mysql.Pool {
   if (!pool) {
-    const ssl = process.env.MYSQL_SSL === "true" ? { rejectUnauthorized: false } : undefined;
+    const isProd = process.env.MYSQL_SSL === "true";
     pool = mysql.createPool({
       host: process.env.MYSQL_HOST || "localhost",
       port: Number(process.env.MYSQL_PORT) || 3306,
@@ -14,7 +14,9 @@ export function getPool(): mysql.Pool {
       waitForConnections: true,
       connectionLimit: 10,
       timezone: "Z",
-      ssl,
+      ssl: isProd ? { rejectUnauthorized: false } : undefined,
+      enableKeepAlive: true,
+      keepAliveInitialDelay: 0,
     });
   }
   return pool;
@@ -42,8 +44,7 @@ async function initSchema() {
       razorpay_order_id VARCHAR(255),
       razorpay_payment_id VARCHAR(255),
       status ENUM('pending','paid','failed') DEFAULT 'pending',
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (company_id) REFERENCES companies(id)
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
 
