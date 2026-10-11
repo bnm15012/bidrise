@@ -108,7 +108,7 @@ export default function Home() {
         {/* Nav bar */}
         <nav className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
           <div className="flex items-center gap-2">
-            <a href="/" className="text-xl font-black tracking-tight text-gray-900 hover:opacity-80 transition-opacity">BID<span className="text-violet-600">RISE</span></a>
+            <a href="/" className="text-xl font-black tracking-tight text-gray-900 hover:opacity-80 transition-opacity">BID <span className="text-violet-600">RISE</span></a>
           </div>
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
