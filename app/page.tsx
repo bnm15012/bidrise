@@ -30,7 +30,7 @@ export default function Home() {
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+  const [, setLastUpdate] = useState<Date | null>(null);
   const [mounted, setMounted] = useState(false);
   const [elapsed, setElapsed] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -57,24 +57,40 @@ export default function Home() {
     return () => clearInterval(t);
   }, []);
 
+  const lastBidCountRef = useRef<number>(0);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const IDLE_INTERVAL = 5 * 60 * 1000;  // 5 min when no activity
+  const ACTIVE_INTERVAL = 5 * 1000;     // 5 sec right after a bid
+
+  const scheduleNext = useCallback((hasActivity: boolean) => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    const delay = hasActivity ? ACTIVE_INTERVAL : IDLE_INTERVAL;
+    intervalRef.current = setInterval(() => fetchData(), delay);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const fetchData = useCallback(async () => {
     try {
       const res = await fetch("/api/rankings", { cache: "no-store" });
       const data = await res.json();
+      const newBidCount = (data.recentBids || []).length;
+      const hasActivity = newBidCount !== lastBidCountRef.current;
+      lastBidCountRef.current = newBidCount;
       setRankings(data.rankings || []);
       setRecentBids(data.recentBids || []);
       setLastUpdate(new Date());
+      scheduleNext(hasActivity);
     } catch (e) {
       console.error(e);
+      scheduleNext(false);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [scheduleNext]);
 
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 5000);
-    return () => clearInterval(interval);
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [fetchData]);
 
   useEffect(() => {
