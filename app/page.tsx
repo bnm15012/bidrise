@@ -32,6 +32,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [elapsed, setElapsed] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Company[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
@@ -40,6 +41,21 @@ export default function Home() {
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { setMounted(true); }, []);
+
+  useEffect(() => {
+    // Launch time: Oct 12 2026, 10:00am IST (UTC+5:30)
+    const LAUNCH = new Date("2026-10-12T04:30:00.000Z");
+    const tick = () => {
+      const diff = Math.max(0, Math.floor((Date.now() - LAUNCH.getTime()) / 1000));
+      const h = Math.floor(diff / 3600).toString().padStart(2, "0");
+      const m = Math.floor((diff % 3600) / 60).toString().padStart(2, "0");
+      const s = (diff % 60).toString().padStart(2, "0");
+      setElapsed(`${h}:${m}:${s}`);
+    };
+    tick();
+    const t = setInterval(tick, 1000);
+    return () => clearInterval(t);
+  }, []);
 
   const fetchData = useCallback(async () => {
     try {
@@ -113,8 +129,8 @@ export default function Home() {
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <span className="text-xs font-medium text-gray-500 font-mono">LIVE</span>
-            {mounted && lastUpdate && (
-              <span className="text-xs text-gray-400 font-mono ml-1">{lastUpdate.toLocaleTimeString()}</span>
+            {mounted && elapsed && (
+              <span className="text-xs text-gray-400 font-mono ml-1">{elapsed}</span>
             )}
           </div>
           <button
