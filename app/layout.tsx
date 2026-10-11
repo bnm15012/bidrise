@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "RankIt — Bid. Pay. Rise.",
+  title: "BidRise — Bid. Pay. Rise.",
   description: "The world's first bid-powered company ranking. Pay to claim your spot at the top.",
   icons: { icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏆</text></svg>" },
 };
@@ -14,7 +14,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="noise antialiased min-h-screen">{children}</body>
+      <body className="antialiased min-h-screen">{children}</body>
     </html>
   );
 }

@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const company = getCompanyById(Number(company_id));
+    const company = await getCompanyById(Number(company_id));
     if (!company) {
       return NextResponse.json({ error: "Company not found" }, { status: 404 });
     }
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     const order = await razorpay.orders.create({
       amount: amount * 100,
       currency: "INR",
-      receipt: `rankit_${Date.now()}`,
+      receipt: `bidrise_${Date.now()}`,
       notes: {
         company_id: String(company_id),
         company_name: company.name,
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    createBid({
+    await createBid({
       company_id: Number(company_id),
       bidder_name,
       bidder_email,

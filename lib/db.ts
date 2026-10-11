@@ -10,7 +10,7 @@ export function getPool(): mysql.Pool {
       port: Number(process.env.MYSQL_PORT) || 3306,
       user: process.env.MYSQL_USER || "root",
       password: process.env.MYSQL_PASSWORD,
-      database: process.env.MYSQL_DATABASE || "rankit",
+      database: process.env.MYSQL_DATABASE || "bidrise",
       waitForConnections: true,
       connectionLimit: 10,
       timezone: "Z",
@@ -54,7 +54,6 @@ async function initSchema() {
     const seeds = [
       // 🇮🇳 Indian early-stage startups
       ["Progcap",    "progcap.com",       "Credit access for the last-mile retailer."],
-      ["Jai Kisan",  "jaikisan.co",       "Rural fintech making farming financially viable."],
       ["Niro",       "niro.co",           "Embedded credit for apps your users already use."],
       ["Hissa",      "hissa.com",         "Cap table & ESOP management for early startups."],
       ["Reelo",      "reelo.io",          "Loyalty & marketing OS for local businesses."],

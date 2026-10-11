@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { Trophy, Zap, TrendingUp, Users, ChevronUp } from "lucide-react";
+import { useEffect, useState, useCallback, useRef } from "react";
+import { Plus, ChevronUp, Search, X } from "lucide-react";
 import BidModal from "@/components/BidModal";
 import RankCard from "@/components/RankCard";
 import LiveFeed from "@/components/LiveFeed";
-import Ticker from "@/components/Ticker";
 import CompanyLogo from "@/components/CompanyLogo";
 import AddCompanyModal from "@/components/AddCompanyModal";
 
@@ -33,10 +32,14 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<Company[]>([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  useEffect(() => { setMounted(true); }, []);
 
   const fetchData = useCallback(async () => {
     try {
@@ -58,295 +61,341 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [fetchData]);
 
+  useEffect(() => {
+    if (!searchQuery.trim()) { setSearchResults([]); return; }
+    const t = setTimeout(async () => {
+      setSearchLoading(true);
+      try {
+        const res = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`);
+        const data = await res.json();
+        setSearchResults(data.results || []);
+      } finally {
+        setSearchLoading(false);
+      }
+    }, 250);
+    return () => clearTimeout(t);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setShowSearch(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
   const topThree = rankings.slice(0, 3);
   const rest = rankings.slice(3);
-
   const totalBids = rankings.reduce((s, c) => s + c.total_bid, 0);
 
   return (
-    <main className="relative min-h-screen" style={{ background: "linear-gradient(135deg, #0d0d1a 0%, #110d2e 40%, #1a0d2e 70%, #0d1a2e 100%)" }}>
-      {/* Background grid */}
-      <div
-        className="fixed inset-0 opacity-[0.06]"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(191,90,242,1) 1px, transparent 1px), linear-gradient(90deg, rgba(191,90,242,1) 1px, transparent 1px)",
-          backgroundSize: "60px 60px",
-        }}
-      />
-
-      {/* Ambient glow blobs */}
-      <div className="fixed top-[-10%] left-[-5%] w-[700px] h-[700px] rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(139,92,246,0.25) 0%, transparent 70%)", filter: "blur(60px)" }} />
-      <div className="fixed top-[30%] right-[-10%] w-[500px] h-[500px] rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(236,72,153,0.2) 0%, transparent 70%)", filter: "blur(60px)" }} />
-      <div className="fixed bottom-[-10%] left-[30%] w-[600px] h-[400px] rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(99,102,241,0.2) 0%, transparent 70%)", filter: "blur(80px)" }} />
+    <main className="relative min-h-screen" style={{ background: "linear-gradient(135deg, #f0eeff 0%, #fdf4ff 50%, #fff7f0 100%)" }}>
+      {/* Dot grid */}
+      <div className="fixed inset-0 pointer-events-none" style={{
+        backgroundImage: "radial-gradient(rgba(124,58,237,0.12) 1px, transparent 1px)",
+        backgroundSize: "28px 28px",
+      }} />
+      {/* Color blobs */}
+      <div className="fixed pointer-events-none" style={{ top: "-10%", left: "-5%", width: 600, height: 600, borderRadius: "50%", background: "radial-gradient(circle, rgba(167,139,250,0.25) 0%, transparent 60%)", filter: "blur(60px)" }} />
+      <div className="fixed pointer-events-none" style={{ top: "30%", right: "-5%", width: 500, height: 500, borderRadius: "50%", background: "radial-gradient(circle, rgba(251,146,60,0.2) 0%, transparent 60%)", filter: "blur(60px)" }} />
+      <div className="fixed pointer-events-none" style={{ bottom: "0", left: "30%", width: 600, height: 400, borderRadius: "50%", background: "radial-gradient(circle, rgba(236,72,153,0.15) 0%, transparent 60%)", filter: "blur(60px)" }} />
 
       <div className="relative z-10">
-        {/* Ticker */}
-        <Ticker recentBids={recentBids} />
 
-        {/* Hero */}
-        <section className="pt-16 pb-8 px-4 text-center">
-          <div className="inline-flex items-center gap-2 glass rounded-full px-4 py-1.5 mb-6 text-xs font-mono text-neon-green border border-neon-green/20">
-            <span className="w-2 h-2 rounded-full bg-neon-green animate-pulse" />
-            LIVE RANKINGS • Updates every 5s
+
+        {/* Nav bar */}
+        <nav className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
+          <div className="flex items-center gap-2">
+            <a href="/" className="text-xl font-black tracking-tight text-gray-900 hover:opacity-80 transition-opacity">BID<span className="text-violet-600">RISE</span></a>
           </div>
-
-          <h1 className="text-5xl md:text-8xl font-bold font-display mb-4 leading-none tracking-tight">
-            <span className="text-white">RANK</span>
-            <span
-              className="text-transparent bg-clip-text"
-              style={{
-                backgroundImage:
-                  "linear-gradient(135deg, #39FF14 0%, #FF2D78 50%, #BF5AF2 100%)",
-              }}
-            >
-              IT
-            </span>
-          </h1>
-
-          <p className="text-lg md:text-2xl text-white/50 font-display mb-2">
-            Bid. Pay. Rise to the top.
-          </p>
-          <p className="text-sm text-white/30 max-w-md mx-auto">
-            The world&apos;s first pay-to-rank leaderboard. Drop ₹ on your fav
-            company and watch them climb. No cap.
-          </p>
-
-          {/* Stats bar */}
-          <div className="flex justify-center gap-6 mt-8 flex-wrap">
-            <StatPill
-              icon={<Trophy size={14} />}
-              label="Rankings"
-              value={rankings.length}
-              color="neon-yellow"
-            />
-            <StatPill
-              icon={<Zap size={14} />}
-              label="Total Bid"
-              value={`₹${totalBids.toLocaleString()}`}
-              color="neon-green"
-            />
-            <StatPill
-              icon={<Users size={14} />}
-              label="Bids Placed"
-              value={recentBids.length}
-              color="neon-pink"
-            />
-            <StatPill
-              icon={<TrendingUp size={14} />}
-              label="Last Updated"
-              value={mounted && lastUpdate ? lastUpdate.toLocaleTimeString() : "--:--:--"}
-              color="neon-purple"
-            />
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-xs font-medium text-gray-500 font-mono">LIVE</span>
+            {mounted && lastUpdate && (
+              <span className="text-xs text-gray-400 font-mono ml-1">{lastUpdate.toLocaleTimeString()}</span>
+            )}
           </div>
-
-          {/* Add startup CTA */}
           <button
             onClick={() => setShowAddModal(true)}
-            className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold border border-neon-purple/40 text-neon-purple hover:bg-neon-purple/10 transition-all font-display"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold text-white transition-all"
+            style={{ background: "linear-gradient(135deg, #7c3aed, #6d28d9)" }}
           >
-            <span className="text-base">+</span> List yourself or your company
+            <Plus size={14} />
+            List yourself
           </button>
+        </nav>
+
+        {/* Hero */}
+        <section className="pt-10 pb-12 px-6 text-center max-w-3xl mx-auto">
+          <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-none mb-5 text-gray-900 whitespace-nowrap">
+            Bid to be{" "}
+            <span style={{ background: "linear-gradient(90deg, #7c3aed, #ec4899, #f97316)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+              #1
+            </span>
+          </h1>
+          <p className="text-gray-500 text-lg max-w-md mx-auto leading-relaxed">
+            The world&apos;s first pay-to-rank leaderboard for startups. Place a bid, climb the board, go viral.
+          </p>
+
+          {/* Stats row */}
+          <div className="flex items-center justify-center gap-8 mt-8 flex-wrap">
+            <Stat label="On the board" value={`${rankings.length} startups`} />
+            <div className="w-px h-8 bg-black/10" />
+            <Stat label="Total staked" value={`₹${totalBids.toLocaleString()}`} accent />
+            <div className="w-px h-8 bg-black/10" />
+            <Stat label="Recent bids" value={`${recentBids.length}`} />
+          </div>
+
+          {/* Search bar */}
+          <div ref={searchRef} className="relative mt-8 max-w-md mx-auto">
+            <div className="flex items-center gap-3 bg-white rounded-2xl px-4 py-3 shadow-sm border border-gray-100">
+              <Search size={16} className="text-gray-300 flex-shrink-0" />
+              <input
+                ref={searchInputRef}
+                type="text"
+                value={searchQuery}
+                onChange={(e) => { setSearchQuery(e.target.value); setShowSearch(true); }}
+                onFocus={() => setShowSearch(true)}
+                className="flex-1 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none bg-transparent"
+                placeholder="Search any company..."
+              />
+              {searchQuery && (
+                <button onClick={() => { setSearchQuery(""); setSearchResults([]); }} className="text-gray-300 hover:text-gray-500 transition-colors">
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+
+            {/* Dropdown results */}
+            {showSearch && (searchQuery.trim()) && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50">
+                {searchLoading ? (
+                  <div className="px-4 py-3 text-sm text-gray-400">Searching...</div>
+                ) : searchResults.length === 0 ? (
+                  <div className="px-4 py-3 text-sm text-gray-400">No companies found</div>
+                ) : (
+                  searchResults.map((c) => (
+                    <div key={c.id} className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0">
+                      <a href={`https://${c.logo}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 flex-1 min-w-0">
+                        <CompanyLogo domain={c.logo} name={c.name} size={32} />
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-gray-900 truncate">{c.name}</p>
+                          <p className="text-xs text-gray-400 truncate">{c.description}</p>
+                        </div>
+                        <span className="text-xs font-mono text-violet-600 font-semibold flex-shrink-0">₹{c.total_bid.toLocaleString()}</span>
+                      </a>
+                      <button
+                        onClick={() => { setSelectedCompany(c); setShowSearch(false); setSearchQuery(""); }}
+                        className="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold text-white"
+                        style={{ background: "linear-gradient(135deg, #7c3aed, #6d28d9)" }}
+                      >
+                        Bid
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
         </section>
 
-        {/* Podium - Top 3 */}
+        {/* Top 3 podium */}
         {!loading && topThree.length > 0 && (
-          <section className="px-4 max-w-5xl mx-auto mb-10">
-            <div className="text-center mb-6">
-              <span className="text-xs font-mono text-white/30 uppercase tracking-widest">
-                — Hall of Fame —
-              </span>
+          <section className="px-6 max-w-6xl mx-auto mb-8">
+            <div className="flex items-center gap-3 mb-5">
+              <div className="h-px flex-1 bg-black/8" />
+              <span className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Top Ranked</span>
+              <div className="h-px flex-1 bg-black/8" />
             </div>
             <div className="grid grid-cols-3 gap-4 items-end">
-              {/* #2 */}
-              <div className="flex flex-col items-center gap-2">
-                {topThree[1] && (
-                  <PodiumCard
-                    company={topThree[1]}
-                    rank={2}
-                    onBid={() => setSelectedCompany(topThree[1])}
-                    height="h-36"
-                  />
-                )}
-              </div>
-              {/* #1 */}
-              <div className="flex flex-col items-center gap-2">
-                {topThree[0] && (
-                  <PodiumCard
-                    company={topThree[0]}
-                    rank={1}
-                    onBid={() => setSelectedCompany(topThree[0])}
-                    height="h-48"
-                    featured
-                  />
-                )}
-              </div>
-              {/* #3 */}
-              <div className="flex flex-col items-center gap-2">
-                {topThree[2] && (
-                  <PodiumCard
-                    company={topThree[2]}
-                    rank={3}
-                    onBid={() => setSelectedCompany(topThree[2])}
-                    height="h-28"
-                  />
-                )}
-              </div>
+              {/* 2nd */}
+              <PodiumCard company={topThree[1]} rank={2} onBid={() => setSelectedCompany(topThree[1])} />
+              {/* 1st */}
+              <PodiumCard company={topThree[0]} rank={1} onBid={() => setSelectedCompany(topThree[0])} />
+              {/* 3rd */}
+              <PodiumCard company={topThree[2]} rank={3} onBid={() => setSelectedCompany(topThree[2])} />
             </div>
           </section>
         )}
 
-        {/* Rest of rankings + live feed */}
-        <section className="px-4 max-w-5xl mx-auto pb-20">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Rankings list */}
-            <div className="lg:col-span-2 space-y-3">
-              <h2 className="text-xs font-mono text-white/40 uppercase tracking-widest mb-4">
-                Full Leaderboard
-              </h2>
+        {/* Leaderboard + live feed */}
+        <section className="px-6 max-w-6xl mx-auto pb-24">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
+            {/* Rankings */}
+            <div className="lg:col-span-3 space-y-2.5">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Full Leaderboard</span>
+                <span className="text-xs text-gray-400 font-mono">{rankings.length} companies</span>
+              </div>
               {loading ? (
-                <div className="space-y-3">
-                  {[...Array(5)].map((_, i) => (
-                    <div
-                      key={i}
-                      className="h-20 glass rounded-2xl animate-pulse"
-                    />
-                  ))}
-                </div>
+                [...Array(4)].map((_, i) => (
+                  <div key={i} className="h-[72px] rounded-2xl shimmer" />
+                ))
               ) : (
                 rest.map((company, i) => (
-                  <RankCard
-                    key={company.id}
-                    company={company}
-                    rank={i + 4}
-                    onBid={() => setSelectedCompany(company)}
-                  />
+                  <RankCard key={company.id} company={company} rank={i + 4} onBid={() => setSelectedCompany(company)} />
                 ))
               )}
             </div>
 
-            {/* Live feed */}
-            <div className="lg:col-span-1">
+            {/* Right col */}
+            <div className="lg:col-span-2 space-y-4">
               <LiveFeed bids={recentBids} />
+
+              {/* How it works */}
+              <div className="glass rounded-2xl p-5">
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">How it works</p>
+                <div className="space-y-3">
+                  {[
+                    { n: "1", t: "Pick a startup", d: "Find your favourite on the board" },
+                    { n: "2", t: "Place a bid", d: "Any amount — ₹1 to ₹1L+" },
+                    { n: "3", t: "Watch them rise", d: "Rankings update in real time" },
+                  ].map((s) => (
+                    <div key={s.n} className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold text-violet-600 flex-shrink-0 mt-0.5" style={{ background: "rgba(124,58,237,0.1)" }}>
+                        {s.n}
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-gray-800">{s.t}</p>
+                        <p className="text-xs text-gray-400">{s.d}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </section>
       </div>
 
-      {/* Bid modal */}
       {selectedCompany && (
         <BidModal
           company={selectedCompany}
           onClose={() => setSelectedCompany(null)}
-          onSuccess={() => {
-            setSelectedCompany(null);
-            fetchData();
-          }}
+          onSuccess={() => { setSelectedCompany(null); fetchData(); }}
         />
       )}
 
-      {/* Add company modal */}
       {showAddModal && (
         <AddCompanyModal
           onClose={() => setShowAddModal(false)}
-          onAdded={(company) => {
-            setShowAddModal(false);
-            setSelectedCompany(company);
-            fetchData();
-          }}
+          onAdded={(company) => { setShowAddModal(false); setSelectedCompany(company); fetchData(); }}
         />
       )}
 
-      {/* Scroll to top */}
       <button
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        className="fixed bottom-6 right-6 w-10 h-10 glass rounded-full flex items-center justify-center text-white/60 hover:text-white hover:glow-purple transition-all z-50"
+        className="fixed bottom-6 right-6 w-9 h-9 glass-strong rounded-full flex items-center justify-center text-white/50 hover:text-white transition-all z-50"
       >
-        <ChevronUp size={18} />
+        <ChevronUp size={16} />
       </button>
     </main>
   );
 }
 
-function StatPill({
-  icon,
-  label,
-  value,
-  color,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string | number;
-  color: string;
-}) {
-  const colorMap: Record<string, string> = {
-    "neon-yellow": "text-neon-yellow border-neon-yellow/20",
-    "neon-green": "text-neon-green border-neon-green/20",
-    "neon-pink": "text-neon-pink border-neon-pink/20",
-    "neon-purple": "text-neon-purple border-neon-purple/20",
-  };
-
+function Stat({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
-    <div
-      className={`glass border rounded-xl px-4 py-2 flex items-center gap-2 text-sm ${colorMap[color] || ""}`}
-    >
-      {icon}
-      <span className="text-white/40 text-xs">{label}:</span>
-      <span className="font-mono font-semibold">{value}</span>
+    <div className="text-center">
+      <p className={`text-2xl font-bold ${accent ? "text-violet-600" : "text-gray-900"}`}>{value}</p>
+      <p className="text-xs text-gray-400 mt-0.5">{label}</p>
     </div>
   );
 }
 
-function PodiumCard({
-  company,
-  rank,
-  onBid,
-  height,
-  featured,
-}: {
-  company: Company;
-  rank: number;
-  onBid: () => void;
-  height: string;
-  featured?: boolean;
-}) {
-  const rankStyles: Record<number, string> = {
-    1: "from-yellow-400/20 to-orange-500/10 border-yellow-400/30",
-    2: "from-gray-400/20 to-gray-500/10 border-gray-400/30",
-    3: "from-orange-700/20 to-orange-900/10 border-orange-700/30",
+function PodiumCard({ company, rank, onBid }: { company: Company; rank: number; onBid: () => void }) {
+  if (!company) return <div />;
+
+  const logoSize = rank === 1 ? 88 : rank === 2 ? 68 : 60;
+
+  const cardStyles: Record<number, React.CSSProperties> = {
+    1: {
+      background: "linear-gradient(160deg, #3b0764 0%, #6d28d9 60%, #9333ea 100%)",
+      border: "1.5px solid rgba(250,204,21,0.6)",
+      padding: "28px 20px",
+      boxShadow: "0 20px 60px rgba(109,40,217,0.45), 0 0 0 1px rgba(250,204,21,0.2)",
+    },
+    2: {
+      background: "linear-gradient(160deg, #1e293b 0%, #334155 100%)",
+      border: "1px solid rgba(148,163,184,0.4)",
+      padding: "20px 16px",
+      boxShadow: "0 10px 30px rgba(30,41,59,0.3)",
+    },
+    3: {
+      background: "linear-gradient(160deg, #431407 0%, #9a3412 100%)",
+      border: "1px solid rgba(251,146,60,0.4)",
+      padding: "20px 16px",
+      boxShadow: "0 10px 30px rgba(67,20,7,0.3)",
+    },
   };
 
-  const badgeStyles: Record<number, string> = {
-    1: "rank-1",
-    2: "rank-2",
-    3: "rank-3",
+  const rankBadgeStyles: Record<number, string> = {
+    1: "linear-gradient(135deg,#fbbf24,#f97316)",
+    2: "linear-gradient(135deg,#94a3b8,#cbd5e1)",
+    3: "linear-gradient(135deg,#fb923c,#ea580c)",
   };
 
-  const rankEmojis: Record<number, string> = { 1: "👑", 2: "🥈", 3: "🥉" };
+  const nameColor = rank === 1 ? "#fff" : rank === 2 ? "#e2e8f0" : "#fed7aa";
+  const amountColor = rank === 1 ? "#c4b5fd" : rank === 2 ? "#94a3b8" : "#fb923c";
+  const topOffset = rank === 1 ? "pt-0" : rank === 2 ? "pt-10" : "pt-16";
 
   return (
-    <button
-      onClick={onBid}
-      className={`w-full glass bg-gradient-to-b ${rankStyles[rank]} border rounded-2xl p-4 flex flex-col items-center gap-2 hover:scale-105 transition-all duration-300 group ${featured ? "glow-purple" : ""}`}
-    >
-      {rank === 1 && (
-        <span className="text-2xl animate-bounce-slow">👑</span>
-      )}
-      <CompanyLogo domain={company.logo} name={company.name} size={52} />
-      <div
-        className={`text-xs font-mono font-bold w-6 h-6 rounded-full flex items-center justify-center text-black ${badgeStyles[rank]}`}
+    <div className={`${topOffset} relative`}>
+      <button
+        onClick={onBid}
+        className="w-full rounded-3xl flex flex-col items-center gap-3 transition-all duration-200 hover:scale-[1.03] group overflow-hidden"
+        style={cardStyles[rank]}
       >
-        {rank}
-      </div>
-      <p className="text-white font-semibold text-sm text-center leading-tight">
-        {company.name}
-      </p>
-      <p className="text-neon-green font-mono text-xs font-bold">
-        ₹{company.total_bid.toLocaleString()}
-      </p>
-      <span className="text-[10px] text-white/0 group-hover:text-white/60 transition-all font-mono">
-        + BID NOW
-      </span>
-    </button>
+        {/* Crown for #1 */}
+        {rank === 1 && <span className="text-2xl -mb-1">👑</span>}
+
+        {/* Logo */}
+        <div style={{
+          padding: 8,
+          borderRadius: 20,
+          background: "rgba(255,255,255,0.15)",
+          boxShadow: rank === 1 ? "0 0 40px rgba(250,204,21,0.3), inset 0 1px 0 rgba(255,255,255,0.2)" : "inset 0 1px 0 rgba(255,255,255,0.1)",
+        }}>
+          <CompanyLogo domain={company.logo} name={company.name} size={logoSize} />
+        </div>
+
+        {/* Rank badge */}
+        <div
+          className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-black text-white shadow-lg"
+          style={{ background: rankBadgeStyles[rank] }}
+        >
+          {rank}
+        </div>
+
+        {/* Name & amount */}
+        <div className="text-center">
+          <p className={`font-bold leading-tight ${rank === 1 ? "text-base" : "text-sm"}`} style={{ color: nameColor }}>{company.name}</p>
+          <p className="text-xs font-mono font-semibold mt-1" style={{ color: amountColor }}>
+            ₹{company.total_bid.toLocaleString()}
+          </p>
+        </div>
+
+        {/* Website link */}
+        <a
+          href={`https://${company.logo}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
+          className="text-[10px] font-mono px-3 py-1 rounded-full transition-all"
+          style={{
+            color: rank === 1 ? "rgba(196,181,253,0.8)" : "rgba(255,255,255,0.4)",
+            background: "rgba(255,255,255,0.08)",
+            border: "1px solid rgba(255,255,255,0.1)",
+          }}
+        >
+          {company.logo} ↗
+        </a>
+
+        <span className="text-[10px] font-semibold tracking-widest" style={{ color: "rgba(255,255,255,0.0)" }}>
+          <span className="group-hover:opacity-100 opacity-0 transition-opacity" style={{ color: rank === 1 ? "#c4b5fd" : "rgba(255,255,255,0.5)" }}>BID NOW →</span>
+        </span>
+      </button>
+    </div>
   );
 }

@@ -14,8 +14,8 @@ export default function Ticker({ recentBids }: Props) {
     .join("   ·   ");
 
   return (
-    <div className="bg-neon-green/10 border-b border-neon-green/20 overflow-hidden h-7 flex items-center">
-      <div className="whitespace-nowrap ticker-animation text-[11px] font-mono text-neon-green font-semibold">
+    <div className="bg-emerald-50 border-b border-emerald-100 overflow-hidden h-7 flex items-center">
+      <div className="whitespace-nowrap ticker-animation text-[11px] font-mono text-emerald-600 font-semibold">
         {text} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {text}
       </div>
     </div>

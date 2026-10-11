@@ -13,7 +13,7 @@ export default function CompanyLogo({ domain, name, size = 40, className = "" }:
   const [failed, setFailed] = useState(false);
 
   const initial = name[0]?.toUpperCase() ?? "?";
-  const hue = [...name].reduce((acc, c) => acc + c.charCodeAt(0), 0) % 360;
+  const hue = name.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0) % 360;
 
   if (failed || !domain) {
     return (
@@ -32,6 +32,7 @@ export default function CompanyLogo({ domain, name, size = 40, className = "" }:
   }
 
   return (
+    // eslint-disable-next-line @next/next/no-img-element
     <img
       src={`/api/logo?domain=${encodeURIComponent(domain)}`}
       alt={`${name} logo`}
