@@ -26,12 +26,14 @@ async function initSchema() {
   const db = getPool();
   await db.execute(`
     CREATE TABLE IF NOT EXISTS companies (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      name VARCHAR(255) NOT NULL UNIQUE,
+      id INT NOT NULL AUTO_INCREMENT,
+      name VARCHAR(255) NOT NULL,
       logo VARCHAR(100) NOT NULL,
       description TEXT,
       total_bid BIGINT DEFAULT 0,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (id),
+      UNIQUE KEY uq_name (name)
     )
   `);
   await db.execute(`
