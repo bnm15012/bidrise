@@ -34,7 +34,7 @@ export default function CompanyLogo({ domain, name, size = 40, className = "" }:
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={`/api/logo?domain=${encodeURIComponent(domain)}`}
+      src={`https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://${domain}&size=128`}
       alt={`${name} logo`}
       width={size}
       height={size}
