@@ -59,7 +59,7 @@ async function initSchema() {
       ["Hissa",      "hissa.com",         "Cap table & ESOP management for early startups."],
       ["Reelo",      "reelo.io",          "Loyalty & marketing OS for local businesses."],
       ["Junio",      "junio.in",          "Smart money app built for Indian kids & teens."],
-      ["Vokal",      "vokal.in",          "Vernacular knowledge platform for Bharat."],
+      ["Vokal",      "vokal.app",         "Vernacular knowledge platform for Bharat."],
       ["Jar",        "myjar.app",         "Save in digital gold with every UPI spend."],
       ["Vahan",      "vahan.co",          "AI recruiter for India's blue-collar workforce."],
       ["SuperK",     "superk.in",         "Franchise kirana stores for rural India."],
