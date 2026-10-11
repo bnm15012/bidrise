@@ -13,7 +13,7 @@ export default function RankCard({ company, rank, onBid }: Props) {
       onClick={onBid}
       className="w-full glass rounded-2xl px-4 py-3.5 flex items-center gap-4 text-left group hover:shadow-md transition-all duration-200"
     >
-      <span className="w-7 text-center text-sm font-bold text-gray-300 flex-shrink-0 font-mono">
+      <span className="w-7 text-center text-sm font-bold text-gray-900 flex-shrink-0 font-mono">
         {rank}
       </span>
 
@@ -36,7 +36,7 @@ export default function RankCard({ company, rank, onBid }: Props) {
         <span className="text-sm font-bold font-mono text-violet-600">
           ₹{company.total_bid.toLocaleString()}
         </span>
-        <span className="text-[10px] font-semibold text-transparent group-hover:text-violet-500 transition-colors">
+        <span className="text-[10px] font-semibold text-violet-400 group-hover:text-violet-600 transition-colors">
           BID →
         </span>
       </div>
