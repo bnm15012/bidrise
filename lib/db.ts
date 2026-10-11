@@ -125,8 +125,7 @@ export async function getRankings(limit = 7): Promise<Company[]> {
   await ensureSchema();
   const db = getPool();
   const [rows] = await db.execute<mysql.RowDataPacket[]>(
-    "SELECT * FROM companies ORDER BY total_bid DESC, id ASC LIMIT ?",
-    [limit]
+    `SELECT * FROM companies ORDER BY total_bid DESC, id ASC LIMIT ${limit}`
   );
   return rows as Company[];
 }
@@ -212,8 +211,7 @@ export async function getRecentBids(
      FROM bids b JOIN companies c ON b.company_id = c.id
      WHERE b.status = 'paid'
      ORDER BY b.created_at DESC
-     LIMIT ?`,
-    [limit]
+     LIMIT ${limit}`
   );
   return rows as (Bid & { company_name: string })[];
 }
