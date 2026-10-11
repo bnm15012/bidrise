@@ -60,8 +60,8 @@ export default function Home() {
   const lastBidCountRef = useRef<number>(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const IDLE_INTERVAL = 60 * 60 * 1000; // 1 hr when no activity
-  const ACTIVE_INTERVAL = 5 * 1000;     // 5 sec right after a bid
+  const IDLE_INTERVAL = 30 * 1000;  // 30 sec normally
+  const ACTIVE_INTERVAL = 5 * 1000; // 5 sec burst when new bid detected
 
   const scheduleNext = useCallback((hasActivity: boolean) => {
     if (intervalRef.current) clearInterval(intervalRef.current);
