@@ -35,7 +35,7 @@ type RazorpayResponse = {
 
 type Props = { company: Company; onClose: () => void; onSuccess: () => void };
 
-const QUICK_BIDS = [100, 500, 1000, 5000];
+const QUICK_BIDS = [500, 1000, 2500, 5000];
 
 export default function BidModal({ company, onClose, onSuccess }: Props) {
   const [amount, setAmount] = useState<string>("500");
@@ -64,7 +64,7 @@ export default function BidModal({ company, onClose, onSuccess }: Props) {
     const amt = parseInt(amount);
     if (!name.trim()) { setError("Your name is required"); return; }
     if (!email.trim() || !email.includes("@")) { setError("Need a valid email"); return; }
-    if (!amt || amt < 1) { setError("Min bid is ₹1"); return; }
+    if (!amt || amt < 500) { setError("Minimum bid is ₹500"); return; }
 
     setLoading(true);
     setStep("processing");
@@ -189,7 +189,7 @@ export default function BidModal({ company, onClose, onSuccess }: Props) {
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 font-mono">₹</span>
                 <input
                   type="number"
-                  min="1"
+                  min="500"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   className="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 pl-8 pr-4 text-gray-900 font-mono text-lg focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition-all"

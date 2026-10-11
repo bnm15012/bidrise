@@ -282,7 +282,7 @@ export default function Home() {
                 <div className="space-y-3">
                   {[
                     { n: "1", t: "Pick a startup", d: "Find your favourite on the board" },
-                    { n: "2", t: "Place a bid", d: "Any amount — ₹1 to ₹1L+" },
+                    { n: "2", t: "Place a bid", d: "Min ₹500 — no upper limit" },
                     { n: "3", t: "Watch them rise", d: "Rankings update in real time" },
                   ].map((s) => (
                     <div key={s.n} className="flex items-start gap-3">
