@@ -4,7 +4,7 @@ let pool: mysql.Pool | null = null;
 
 export function getPool(): mysql.Pool {
   if (!pool) {
-    const ssl = process.env.MYSQL_SSL === "true" ? { rejectUnauthorized: true } : undefined;
+    const ssl = process.env.MYSQL_SSL === "true" ? { rejectUnauthorized: false } : undefined;
     pool = mysql.createPool({
       host: process.env.MYSQL_HOST || "localhost",
       port: Number(process.env.MYSQL_PORT) || 3306,
