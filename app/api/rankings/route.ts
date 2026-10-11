@@ -12,6 +12,6 @@ export async function GET() {
     return NextResponse.json({ rankings, recentBids });
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ error: "Failed to fetch" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch", detail: String(err) }, { status: 500 });
   }
 }
