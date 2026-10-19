@@ -27,7 +27,7 @@ export default function LiveFeed({ bids }: Props) {
       ) : (
         <div className="space-y-3">
           {bids.map((bid, i) => (
-            <div key={bid.id} className="flex items-center gap-3" style={{ opacity: Math.max(0.4, 1 - i * 0.1) }}>
+            <div key={bid.id} className="flex items-center gap-3" style={{ opacity: Math.max(0.75, 1 - i * 0.03) }}>
               <div
                 className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
                 style={{ background: `hsl(${(bid.id * 47) % 360}, 60%, 50%)` }}
@@ -40,9 +40,9 @@ export default function LiveFeed({ bids }: Props) {
                   {" → "}
                   <span className="text-violet-600">{bid.company_name}</span>
                 </p>
-                <p className="text-xs font-bold font-mono text-emerald-600">+₹{bid.amount.toLocaleString()}</p>
+                <p className="text-xs font-bold font-mono text-emerald-700">+₹{bid.amount.toLocaleString()}</p>
               </div>
-              <span className="text-[10px] text-gray-300 font-mono flex-shrink-0">{timeAgo(bid.created_at)}</span>
+              <span className="text-[10px] text-gray-400 font-mono flex-shrink-0">{timeAgo(bid.created_at)}</span>
             </div>
           ))}
         </div>
