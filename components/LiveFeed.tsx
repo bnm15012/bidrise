@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import type { RecentBid } from "@/app/page";
 
 type Props = { bids: RecentBid[] };
@@ -12,6 +13,31 @@ function timeAgo(dateStr: string): string {
 }
 
 export default function LiveFeed({ bids }: Props) {
+  const [displayed, setDisplayed] = useState<RecentBid[]>([]);
+  const [newId, setNewId] = useState<number | null>(null);
+  const indexRef = useRef(0);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    if (bids.length === 0) return;
+
+    // Seed initial display with first 5
+    setDisplayed(bids.slice(0, 5));
+    indexRef.current = 5;
+
+    // Cycle through bids every 2.5 seconds
+    intervalRef.current = setInterval(() => {
+      const next = bids[indexRef.current % bids.length];
+      setNewId(next.id);
+      setDisplayed(prev => [next, ...prev.slice(0, 4)]);
+      indexRef.current++;
+      // Clear highlight after animation
+      setTimeout(() => setNewId(null), 800);
+    }, 2500);
+
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+  }, [bids]);
+
   return (
     <div className="glass rounded-2xl p-5">
       <div className="flex items-center gap-2 mb-4">
@@ -25,12 +51,20 @@ export default function LiveFeed({ bids }: Props) {
           <p className="text-gray-300 text-xs mt-1">Be the first to place one.</p>
         </div>
       ) : (
-        <div className="space-y-3">
-          {bids.map((bid, i) => (
-            <div key={bid.id} className="flex items-center gap-3" style={{ opacity: Math.max(0.75, 1 - i * 0.03) }}>
+        <div className="space-y-3 overflow-hidden">
+          {displayed.map((bid, i) => (
+            <div
+              key={`${bid.id}-${i}`}
+              className="flex items-center gap-3 transition-all duration-500"
+              style={{
+                opacity: i === 0 ? 1 : Math.max(0.75, 1 - i * 0.08),
+                transform: i === 0 && bid.id === newId ? "translateY(0)" : "translateY(0)",
+                animation: i === 0 && bid.id === newId ? "slideIn 0.4s ease-out" : undefined,
+              }}
+            >
               <div
                 className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
-                style={{ background: `hsl(${(bid.id * 47) % 360}, 60%, 50%)` }}
+                style={{ background: `hsl(${(bid.bidder_name.charCodeAt(0) * 47) % 360}, 60%, 45%)` }}
               >
                 {bid.bidder_name[0]?.toUpperCase()}
               </div>
@@ -47,6 +81,13 @@ export default function LiveFeed({ bids }: Props) {
           ))}
         </div>
       )}
+
+      <style jsx>{`
+        @keyframes slideIn {
+          from { opacity: 0; transform: translateY(-16px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </div>
   );
 }
