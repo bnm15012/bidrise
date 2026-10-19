@@ -21,7 +21,8 @@ export default function LiveFeed({ bids }: Props) {
   useEffect(() => {
     if (bids.length === 0) return;
 
-    // Seed initial display with first 5
+    // Reset and restart whenever bids updates (new real bid came in)
+    if (intervalRef.current) clearInterval(intervalRef.current);
     setDisplayed(bids.slice(0, 5));
     indexRef.current = 5;
 
@@ -31,12 +32,11 @@ export default function LiveFeed({ bids }: Props) {
       setNewId(next.id);
       setDisplayed(prev => [next, ...prev.slice(0, 4)]);
       indexRef.current++;
-      // Clear highlight after animation
       setTimeout(() => setNewId(null), 800);
     }, 2500);
 
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, [bids]);
+  }, [bids]); // re-runs whenever bids array changes (new real payment detected)
 
   return (
     <div className="glass rounded-2xl p-5">
