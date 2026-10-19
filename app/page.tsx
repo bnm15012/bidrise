@@ -167,8 +167,8 @@ export default function Home() {
               #1
             </span>
           </h1>
-          <p className="text-gray-500 text-lg max-w-md mx-auto leading-relaxed">
-            The world&apos;s first pay-to-rank leaderboard for startups. Place a bid, climb the board, go viral.
+          <p className="text-gray-500 text-lg whitespace-nowrap mx-auto leading-relaxed">
+            The world&apos;s first pay-to-rank leaderboard. Place a bid, climb the board, go viral.
           </p>
 
           {/* Stats row */}
