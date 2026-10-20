@@ -64,7 +64,7 @@ export default function BidModal({ company, onClose, onSuccess }: Props) {
     const amt = parseInt(amount);
     if (!name.trim()) { setError("Your name is required"); return; }
     if (!email.trim() || !email.includes("@")) { setError("Need a valid email"); return; }
-    if (!amt || amt < 100) { setError("Minimum bid is ₹100"); return; }
+    if (!amt || amt < 1) { setError("Minimum bid is ₹1"); return; }
 
     setLoading(true);
     setStep("processing");
@@ -189,7 +189,7 @@ export default function BidModal({ company, onClose, onSuccess }: Props) {
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 font-mono">₹</span>
                 <input
                   type="number"
-                  min="100"
+                  min="1"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   className="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 pl-8 pr-4 text-gray-900 font-mono text-lg focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition-all"
