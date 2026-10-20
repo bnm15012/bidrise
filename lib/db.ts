@@ -38,7 +38,7 @@ async function initSchema() {
   `);
   await db.execute(`
     CREATE TABLE IF NOT EXISTS bids (
-      id INT AUTO_INCREMENT PRIMARY KEY,
+      id INT NOT NULL AUTO_INCREMENT,
       company_id INT NOT NULL,
       bidder_name VARCHAR(255) NOT NULL,
       bidder_email VARCHAR(255) NOT NULL,
@@ -46,7 +46,8 @@ async function initSchema() {
       razorpay_order_id VARCHAR(255),
       razorpay_payment_id VARCHAR(255),
       status ENUM('pending','paid','failed') DEFAULT 'pending',
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (id)
     )
   `);
 
