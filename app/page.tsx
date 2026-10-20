@@ -161,13 +161,13 @@ export default function Home() {
 
         {/* Hero */}
         <section className="pt-10 pb-12 px-6 text-center max-w-3xl mx-auto">
-          <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-none mb-5 text-gray-900 whitespace-nowrap">
+          <h1 className="text-5xl md:text-8xl font-black tracking-tighter leading-none mb-5 text-gray-900">
             Bid to be{" "}
             <span style={{ background: "linear-gradient(90deg, #7c3aed, #ec4899, #f97316)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
               #1
             </span>
           </h1>
-          <p className="text-gray-500 text-lg whitespace-nowrap mx-auto leading-relaxed">
+          <p className="text-gray-500 text-sm md:text-lg mx-auto leading-relaxed px-2">
             The world&apos;s first pay-to-rank leaderboard. Place a bid, climb the board, go viral.
           </p>
 
@@ -235,13 +235,13 @@ export default function Home() {
 
         {/* Top 3 podium */}
         {!loading && topThree.length > 0 && (
-          <section className="px-6 max-w-6xl mx-auto mb-8">
+          <section className="px-3 md:px-6 max-w-6xl mx-auto mb-8">
             <div className="flex items-center gap-3 mb-5">
               <div className="h-px flex-1 bg-black/8" />
               <span className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Top Ranked</span>
               <div className="h-px flex-1 bg-black/8" />
             </div>
-            <div className="grid grid-cols-3 gap-4 items-end">
+            <div className="grid grid-cols-3 gap-2 md:gap-4 items-end">
               {/* 2nd */}
               <PodiumCard company={topThree[1]} rank={2} onBid={() => setSelectedCompany(topThree[1])} />
               {/* 1st */}
@@ -339,25 +339,25 @@ function Stat({ label, value, accent }: { label: string; value: string; accent?:
 function PodiumCard({ company, rank, onBid }: { company: Company; rank: number; onBid: () => void }) {
   if (!company) return <div />;
 
-  const logoSize = rank === 1 ? 88 : rank === 2 ? 68 : 60;
+  const logoSize = rank === 1 ? 64 : 48;
 
   const cardStyles: Record<number, React.CSSProperties> = {
     1: {
       background: "linear-gradient(160deg, #3b0764 0%, #6d28d9 60%, #9333ea 100%)",
       border: "1.5px solid rgba(250,204,21,0.6)",
-      padding: "28px 20px",
+      padding: "16px 10px",
       boxShadow: "0 20px 60px rgba(109,40,217,0.45), 0 0 0 1px rgba(250,204,21,0.2)",
     },
     2: {
       background: "linear-gradient(160deg, #1e293b 0%, #334155 100%)",
       border: "1px solid rgba(148,163,184,0.4)",
-      padding: "20px 16px",
+      padding: "12px 8px",
       boxShadow: "0 10px 30px rgba(30,41,59,0.3)",
     },
     3: {
       background: "linear-gradient(160deg, #431407 0%, #9a3412 100%)",
       border: "1px solid rgba(251,146,60,0.4)",
-      padding: "20px 16px",
+      padding: "12px 8px",
       boxShadow: "0 10px 30px rgba(67,20,7,0.3)",
     },
   };
@@ -370,7 +370,7 @@ function PodiumCard({ company, rank, onBid }: { company: Company; rank: number; 
 
   const nameColor = rank === 1 ? "#fff" : rank === 2 ? "#e2e8f0" : "#fed7aa";
   const amountColor = rank === 1 ? "#c4b5fd" : rank === 2 ? "#94a3b8" : "#fb923c";
-  const topOffset = rank === 1 ? "pt-0" : rank === 2 ? "pt-10" : "pt-16";
+  const topOffset = rank === 1 ? "pt-0" : rank === 2 ? "pt-6 md:pt-10" : "pt-10 md:pt-16";
 
   return (
     <div className={`${topOffset} relative`}>
@@ -384,8 +384,8 @@ function PodiumCard({ company, rank, onBid }: { company: Company; rank: number; 
 
         {/* Logo */}
         <div style={{
-          padding: 8,
-          borderRadius: 20,
+          padding: 6,
+          borderRadius: 16,
           background: "rgba(255,255,255,0.15)",
           boxShadow: rank === 1 ? "0 0 40px rgba(250,204,21,0.3), inset 0 1px 0 rgba(255,255,255,0.2)" : "inset 0 1px 0 rgba(255,255,255,0.1)",
         }}>
@@ -402,19 +402,19 @@ function PodiumCard({ company, rank, onBid }: { company: Company; rank: number; 
 
         {/* Name & amount */}
         <div className="text-center">
-          <p className={`font-bold leading-tight ${rank === 1 ? "text-base" : "text-sm"}`} style={{ color: nameColor }}>{company.name}</p>
-          <p className="text-xs font-mono font-semibold mt-1" style={{ color: amountColor }}>
+          <p className="font-bold leading-tight text-xs md:text-sm" style={{ color: nameColor }}>{company.name}</p>
+          <p className="text-[10px] font-mono font-semibold mt-0.5" style={{ color: amountColor }}>
             ₹{company.total_bid.toLocaleString()}
           </p>
         </div>
 
-        {/* Website link */}
+        {/* Website link - hidden on mobile */}
         <a
           href={`https://${company.logo}`}
           target="_blank"
           rel="noopener noreferrer"
           onClick={(e) => e.stopPropagation()}
-          className="text-[10px] font-mono px-3 py-1 rounded-full transition-all"
+          className="hidden md:flex text-[10px] font-mono px-3 py-1 rounded-full transition-all"
           style={{
             color: rank === 1 ? "rgba(196,181,253,0.8)" : "rgba(255,255,255,0.4)",
             background: "rgba(255,255,255,0.08)",
@@ -424,7 +424,7 @@ function PodiumCard({ company, rank, onBid }: { company: Company; rank: number; 
           {company.logo} ↗
         </a>
 
-        <span className="text-[10px] font-bold tracking-widest text-white opacity-80">
+        <span className="text-[9px] md:text-[10px] font-bold tracking-widest text-white opacity-80">
           BID NOW →
         </span>
       </button>
