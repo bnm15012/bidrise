@@ -19,9 +19,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (amount < 500) {
+    if (amount < 100) {
       return NextResponse.json(
-        { error: "Minimum bid is ₹500" },
+        { error: "Minimum bid is ₹100" },
         { status: 400 }
       );
     }
