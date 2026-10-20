@@ -55,31 +55,12 @@ async function initSchema() {
   );
   if (rows[0].c === 0) {
     const seeds = [
-      // 🇮🇳 Well-known Indian startups
-      ["Zepto",        "zeptonow.com",      "10-minute grocery delivery across India."],
-      ["CRED",         "cred.club",         "Rewards app for people who pay credit cards on time."],
-      ["Groww",        "groww.in",          "Simplest way to invest in stocks and mutual funds."],
-      ["PhonePe",      "phonepe.com",       "India's most used UPI payments app."],
-      ["Meesho",       "meesho.com",        "Social commerce platform empowering small businesses."],
-      ["ShareChat",    "sharechat.com",     "India's largest homegrown social media platform."],
-      ["Slice",        "sliceit.in",        "Next-gen credit card for millennials."],
-      ["Zetwerk",      "zetwerk.com",       "B2B marketplace for manufacturing contracts."],
-      ["BrowserStack", "browserstack.com",  "Cloud testing platform used by 50,000+ companies."],
-      ["Postman",      "postman.com",       "API platform used by 30 million developers worldwide."],
-      ["Khatabook",    "khatabook.com",     "Digital ledger app for 10M+ small business owners."],
-      ["Open",         "open.money",        "Business banking and finance OS for SMEs."],
-      ["Darwinbox",    "darwinbox.com",     "Cloud HR platform powering 850+ enterprises."],
-      // 🇺🇸 US AI startups
-      ["Cognition",    "cognition.ai",      "AI software engineer — the one building Devin."],
-      ["Perplexity",   "perplexity.ai",     "AI search that actually cites its sources."],
-      ["Harvey",       "harvey.ai",         "AI legal assistant disrupting BigLaw quietly."],
-      ["Sierra",       "sierra.ai",         "Conversational AI agents for customer experience."],
-      ["Runway",       "runwayml.com",      "Gen-AI video tools taking Hollywood by storm."],
-      ["ElevenLabs",   "elevenlabs.io",     "Voice cloning so good it's a little scary."],
-      ["Razorpay",     "razorpay.com",      "Payment gateway powering 8 million businesses."],
-      ["Cashfree",     "cashfree.com",      "Payments and banking infra for internet businesses."],
-      ["Mistral",      "mistral.ai",        "Lean, open, fast LLMs built out of Paris."],
-      ["Cohere",       "cohere.com",        "Enterprise LLMs for teams that need control."],
+      ["Harvey",    "harvey.ai",      "AI legal assistant disrupting BigLaw quietly."],
+      ["Cashfree",  "cashfree.com",   "Payments and banking infra for internet businesses."],
+      ["Zetwerk",   "zetwerk.com",    "B2B marketplace for manufacturing contracts."],
+      ["Razorpay",  "razorpay.com",   "Payment gateway powering 8 million businesses."],
+      ["Groww",     "groww.in",       "Simplest way to invest in stocks and mutual funds."],
+      ["Darwinbox", "darwinbox.com",  "Cloud HR platform powering 850+ enterprises."],
     ];
     for (const [name, logo, description] of seeds) {
       await db.execute(
